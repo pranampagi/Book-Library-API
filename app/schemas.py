@@ -1,19 +1,27 @@
+"""Pydantic request/response models used by API endpoints."""
+
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class Token(BaseModel):
+    """JWT access token response payload."""
+
     access_token: str
     token_type: str = "bearer"
 
 
 class UserCreate(BaseModel):
+    """Payload for registering a new user."""
+
     username: str = Field(min_length=3, max_length=50)
     password: str = Field(min_length=6, max_length=128)
 
 
 class UserOut(BaseModel):
+    """Public user information returned by the API."""
+
     id: int
     username: str
     role: str
@@ -22,6 +30,8 @@ class UserOut(BaseModel):
 
 
 class BookBase(BaseModel):
+    """Shared fields for book payloads."""
+
     title: str = Field(min_length=1, max_length=255)
     author: str = Field(min_length=1, max_length=255)
     isbn: Optional[str] = Field(default=None, max_length=32)
@@ -31,10 +41,12 @@ class BookBase(BaseModel):
 
 
 class BookCreate(BookBase):
-    pass
+    """Payload for creating a new book entry."""
 
 
 class BookUpdate(BaseModel):
+    """Partial payload for updating an existing book entry."""
+
     title: Optional[str] = Field(default=None, min_length=1, max_length=255)
     author: Optional[str] = Field(default=None, min_length=1, max_length=255)
     isbn: Optional[str] = Field(default=None, max_length=32)
@@ -44,6 +56,8 @@ class BookUpdate(BaseModel):
 
 
 class BookOut(BookBase):
+    """Book response payload returned by CRUD endpoints."""
+
     id: int
     owner_id: int
 
@@ -51,6 +65,8 @@ class BookOut(BookBase):
 
 
 class ExternalBookResult(BaseModel):
+    """Normalized result from external book provider lookups."""
+
     title: str
     authors: list[str]
     isbn: Optional[str] = None

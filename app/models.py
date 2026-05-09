@@ -1,3 +1,5 @@
+"""SQLAlchemy ORM models for users and books."""
+
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
@@ -5,6 +7,8 @@ from app.db.sqlite import Base
 
 
 class User(Base):
+    """Application user with role-based access and owned books."""
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -16,6 +20,8 @@ class User(Base):
 
 
 class Book(Base):
+    """Book catalog entry owned by a user."""
+
     __tablename__ = "books"
     __table_args__ = (UniqueConstraint("owner_id", "isbn", name="uq_owner_isbn"),)
 

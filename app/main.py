@@ -1,3 +1,5 @@
+"""FastAPI application entrypoint and route definitions."""
+
 import logging
 from contextlib import asynccontextmanager
 
@@ -26,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    """Initialize database schema and bootstrap admin account at startup."""
     Base.metadata.create_all(bind=engine)
     db = get_db_session()
     try:
@@ -48,6 +51,7 @@ app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
 
 @app.get("/")
 def root():
+    """Return a simple service status payload with useful links."""
     return {
         "message": "Book Library API is running",
         "docs": "/docs",
@@ -57,6 +61,7 @@ def root():
 
 @app.get("/health")
 def health_check():
+    """Report API health and MongoDB reachability."""
     mongo_status = "ok"
     try:
         get_mongo_db().command("ping")
@@ -68,6 +73,7 @@ def health_check():
 
 @app.post("/auth/register", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
 def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Register a new user account."""
     existing = crud.get_user_by_username(db, user_in.username)
     if existing:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -79,6 +85,7 @@ def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    """Authenticate a user and return an access token."""
     user = crud.get_user_by_username(db, form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -91,6 +98,7 @@ def login_for_access_token(
 
 @app.get("/users/me", response_model=schemas.UserOut)
 def get_me(current_user: User = Depends(get_current_user)):
+    """Return profile details for the authenticated user."""
     return current_user
 
 
@@ -100,6 +108,7 @@ def get_books(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """List books visible to the authenticated user."""
     owner_id = current_user.id if mine_only or current_user.role != "admin" else None
     return crud.list_books(db, owner_id=owner_id)
 
@@ -110,6 +119,7 @@ def create_book(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Create a new book entry for the authenticated user."""
     try:
         book = crud.create_book(db, book_in, current_user.id)
     except IntegrityError:
@@ -135,6 +145,7 @@ def get_book(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Return one book if the user is authorized to access it."""
     book = crud.get_book(db, book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -150,6 +161,7 @@ def update_book(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Update one book if the user is authorized to modify it."""
     book = crud.get_book(db, book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -164,6 +176,7 @@ def delete_book(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Delete one book if the user is authorized to remove it."""
     book = crud.get_book(db, book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -179,6 +192,7 @@ async def external_search(
     provider: str = Query(default="google", pattern="^(google|openlibrary)$"),
     current_user: User = Depends(get_current_user),
 ):
+    """Search external providers for book metadata."""
     _ = current_user
     if provider == "google":
         return await external.search_google_books(q)
@@ -187,4 +201,5 @@ async def external_search(
 
 @app.get("/admin/users", response_model=list[schemas.UserOut])
 def list_users(db: Session = Depends(get_db), _: User = Depends(require_admin)):
+    """List all registered users (admin only)."""
     return db.query(User).order_by(User.id.desc()).all()

@@ -1,7 +1,10 @@
+"""Authentication API tests."""
+
 from fastapi.testclient import TestClient
 
 
 def test_register_and_login(client: TestClient):
+    """Verify user registration, login, and profile retrieval."""
     register_response = client.post(
         "/auth/register",
         json={"username": "alice", "password": "secret123"},

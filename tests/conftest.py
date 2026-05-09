@@ -1,3 +1,5 @@
+"""Shared pytest fixtures for API tests."""
+
 from collections.abc import Generator
 
 import pytest
@@ -13,6 +15,7 @@ from app.models import Base
 
 @pytest.fixture()
 def db_session() -> Generator[Session, None, None]:
+    """Provide an isolated in-memory SQLite session for each test."""
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -31,6 +34,7 @@ def db_session() -> Generator[Session, None, None]:
 
 @pytest.fixture()
 def client(db_session: Session) -> Generator[TestClient, None, None]:
+    """Provide a FastAPI test client bound to the test database session."""
     def override_get_db() -> Generator[Session, None, None]:
         try:
             yield db_session

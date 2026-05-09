@@ -1,3 +1,5 @@
+"""SQLite and SQLAlchemy session utilities."""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
@@ -14,6 +16,7 @@ Base = declarative_base()
 
 
 def get_db():
+    """Yield a request-scoped SQLAlchemy session for FastAPI dependencies."""
     db = SessionLocal()
     try:
         yield db
@@ -22,4 +25,5 @@ def get_db():
 
 
 def get_db_session() -> Session:
+    """Create and return a plain SQLAlchemy session."""
     return SessionLocal()

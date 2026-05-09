@@ -1,7 +1,11 @@
+"""Application settings loaded from environment variables."""
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Centralized configuration model for API runtime and integrations."""
+
     app_name: str = "Book Library API"
     log_level: str = "INFO"
     jwt_secret_key: str = "change-me-in-production"

@@ -1,3 +1,5 @@
+"""Authentication and authorization helpers for JWT-based access control."""
+
 from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException, status
@@ -16,14 +18,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 def get_password_hash(password: str) -> str:
+    """Hash a plaintext password using the configured password hasher."""
     return password_hash.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify that a plaintext password matches the stored hash."""
     return password_hash.verify(plain_password, hashed_password)
 
 
 def create_access_token(subject: str) -> str:
+    """Create a signed JWT token for the given username."""
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=settings.access_token_expire_minutes
     )
@@ -34,6 +39,7 @@ def create_access_token(subject: str) -> str:
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:
+    """Resolve the current user from a bearer token."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -56,6 +62,7 @@ def get_current_user(
 
 
 def require_admin(user: User = Depends(get_current_user)) -> User:
+    """Enforce admin role for privileged endpoints."""
     if user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

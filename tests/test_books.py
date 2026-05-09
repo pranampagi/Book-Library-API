@@ -1,7 +1,10 @@
+"""Book CRUD API tests."""
+
 from fastapi.testclient import TestClient
 
 
 def _register_and_login(client: TestClient, username: str, password: str) -> str:
+    """Create a user and return a valid bearer token."""
     register_response = client.post(
         "/auth/register",
         json={"username": username, "password": password},
@@ -17,6 +20,7 @@ def _register_and_login(client: TestClient, username: str, password: str) -> str
 
 
 def test_books_crud_flow(client: TestClient):
+    """Verify create, list, read, update, and delete flow for books."""
     token = _register_and_login(client, "bob", "secret123")
     headers = {"Authorization": f"Bearer {token}"}
 
