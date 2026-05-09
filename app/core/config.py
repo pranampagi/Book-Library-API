@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     google_books_base_url: str = "https://www.googleapis.com/books/v1/volumes"
     open_library_base_url: str = "https://openlibrary.org/search.json"
+    cors_allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

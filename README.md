@@ -1,23 +1,18 @@
-# Book Library API
+# Book Library App (Client + Server)
 
-A production-style Book Library API built with FastAPI, SQLAlchemy (SQLite), MongoDB, JWT authentication, and Docker.
+A complete client-server book library application:
 
-## Features
+- **Backend Server:** FastAPI + SQLAlchemy + SQLite + MongoDB event logging
+- **Frontend Client:** Vue 3 + Vite (separate app)
+- **Communication:** HTTP API with JWT bearer auth
 
-- User registration and JWT login.
-- Role-based authorization (`user`, `admin`).
-- CRUD operations for books.
-- External search integration with Google Books / Open Library.
-- SQLite for core relational data and MongoDB for event logging.
-- Docker and Docker Compose support.
+The backend and frontend run as independent services and can be started separately or together.
 
-## Tech Stack
+## Architecture
 
-- Python
-- FastAPI
-- SQLAlchemy + SQLite
-- MongoDB (PyMongo)
-- Docker
+- **Client (`frontend/`)** handles UI and user interaction.
+- **Server (`app/`)** handles authentication, authorization, business logic, and persistence.
+- **Database Layer:** SQLite for core records, MongoDB for optional event logs.
 
 ## API Endpoints
 
@@ -40,60 +35,55 @@ A production-style Book Library API built with FastAPI, SQLAlchemy (SQLite), Mon
 
 - `GET /admin/users` - List all users (admin only).
 
-## Quickstart (Local)
+## Local Development
 
-1. Create and activate a virtual env:
+### 1) Start the backend server
 
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   ```
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload
+```
 
-2. Install dependencies:
+Backend runs on [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+- Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- Root endpoint: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
-3. Create env file:
+### 2) Start the frontend client
 
-   ```bash
-   cp .env.example .env
-   ```
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
 
-4. Run API:
+Frontend runs on [http://127.0.0.1:5173](http://127.0.0.1:5173)
 
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-
-5. Open docs:
-
-   - Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
-- Root endpoint: [http://localhost:8000/](http://localhost:8000/)
-
-## Docker
+## Docker Compose (Full Stack)
 
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
 
-- API: [http://localhost:8000](http://localhost:8000)
+- Backend API: [http://localhost:8000](http://localhost:8000)
+- Frontend client: [http://localhost:5173](http://localhost:5173)
 - MongoDB: `localhost:27017`
 
-## Testing
+## Frontend Environment
 
-```bash
-pytest -q
-```
+- `VITE_API_BASE_URL` (default: `http://127.0.0.1:8000`)
 
 ## Default Admin User
 
 An admin user is auto-created on startup:
 
 - Username: `admin`
-- Password: `admin123`
+- Password: set from `.env` (`BOOTSTRAP_ADMIN_PASSWORD`)
 
 Change this pattern for production.
 
@@ -103,8 +93,24 @@ Change this pattern for production.
 2. Login via `/auth/token` using form data (`username`, `password`).
 3. Copy `access_token` and authorize with `Bearer <token>`.
 
+## Testing
+
+### Backend tests
+
+```bash
+pytest -q
+```
+
+### Frontend build check
+
+```bash
+cd frontend
+npm run build
+```
+
 ## Notes
 
 - SQLite is used for primary CRUD records.
 - MongoDB is used for book event logs (`book_events` collection).
+- CORS is enabled for frontend origins on port `5173`.
 - For production deployment, use secure secrets and managed database services.
