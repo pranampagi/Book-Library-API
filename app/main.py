@@ -153,6 +153,19 @@ def create_book(
     return book
 
 
+@app.get("/books/external/search", response_model=list[schemas.ExternalBookResult])
+async def external_search(
+    q: str = Query(..., min_length=2),
+    provider: str = Query(default="google", pattern="^(google|openlibrary)$"),
+    current_user: User = Depends(get_current_user),
+):
+    """Search external providers for book metadata."""
+    _ = current_user
+    if provider == "google":
+        return await external.search_google_books(q)
+    return await external.search_open_library(q)
+
+
 @app.get("/books/{book_id}", response_model=schemas.BookOut)
 def get_book(
     book_id: int,
@@ -198,19 +211,6 @@ def delete_book(
         raise HTTPException(status_code=403, detail="Access denied")
     crud.delete_book(db, book)
     return None
-
-
-@app.get("/books/external/search", response_model=list[schemas.ExternalBookResult])
-async def external_search(
-    q: str = Query(..., min_length=2),
-    provider: str = Query(default="google", pattern="^(google|openlibrary)$"),
-    current_user: User = Depends(get_current_user),
-):
-    """Search external providers for book metadata."""
-    _ = current_user
-    if provider == "google":
-        return await external.search_google_books(q)
-    return await external.search_open_library(q)
 
 
 @app.get("/admin/users", response_model=list[schemas.UserOut])
