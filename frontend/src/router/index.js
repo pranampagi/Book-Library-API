@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import SignInView from "../views/SignInView.vue";
+import RegisterView from "../views/RegisterView.vue";
 import DashboardView from "../views/DashboardView.vue";
 import CatalogView from "../views/CatalogView.vue";
 import DiscoverView from "../views/DiscoverView.vue";
@@ -8,6 +9,7 @@ import DiscoverView from "../views/DiscoverView.vue";
 const routes = [
   { path: "/", name: "home", component: HomeView, meta: { title: "Home" } },
   { path: "/sign-in", name: "sign-in", component: SignInView, meta: { title: "Sign in" } },
+  { path: "/register", name: "register", component: RegisterView, meta: { title: "Register" } },
   {
     path: "/dashboard",
     name: "dashboard",
@@ -43,7 +45,7 @@ router.beforeEach((to, _from, next) => {
     next({ name: "sign-in", query: { redirect: to.fullPath } });
     return;
   }
-  if (to.name === "sign-in" && loggedIn) {
+  if ((to.name === "sign-in" || to.name === "register") && loggedIn) {
     next({ name: "dashboard" });
     return;
   }

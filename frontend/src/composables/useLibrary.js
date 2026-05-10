@@ -101,9 +101,9 @@ export function useLibrary() {
     });
   }
 
-  async function handleRegister() {
-    const username = authForm.username.trim();
-    const password = authForm.password;
+  async function handleRegister(usernameInput, passwordInput) {
+    const username = (usernameInput ?? authForm.username).trim();
+    const password = passwordInput ?? authForm.password;
     if (username.length < 3) {
       setError("Username must be at least 3 characters.");
       return;
@@ -117,9 +117,9 @@ export function useLibrary() {
     }, "User registered. You can now log in.");
   }
 
-  async function handleLogin() {
-    const username = authForm.username.trim();
-    const password = authForm.password;
+  async function handleLogin(usernameInput, passwordInput) {
+    const username = (usernameInput ?? authForm.username).trim();
+    const password = passwordInput ?? authForm.password;
     if (!username || !password) {
       setError("Enter username and password.");
       return;

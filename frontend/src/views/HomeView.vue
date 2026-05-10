@@ -15,7 +15,8 @@ const { apiBaseUrl, isLoggedIn } = useLibrary();
           filter your collection, and discover titles from external providers.
         </p>
         <div class="d-flex flex-wrap gap-2">
-          <RouterLink v-if="!isLoggedIn" class="btn btn-primary btn-lg" to="/sign-in">Get started</RouterLink>
+          <RouterLink v-if="!isLoggedIn" class="btn btn-primary btn-lg" to="/sign-in">Sign in</RouterLink>
+          <RouterLink v-if="!isLoggedIn" class="btn btn-outline-primary btn-lg" to="/register">Register</RouterLink>
           <RouterLink v-else class="btn btn-primary btn-lg" to="/dashboard">Open dashboard</RouterLink>
           <a class="btn btn-outline-secondary btn-lg" :href="`${apiBaseUrl}/docs`" target="_blank" rel="noopener">
             API documentation

@@ -49,9 +49,14 @@ function onLogout() {
               <router-link class="nav-link" active-class="active" to="/discover">Discover</router-link>
             </li>
           </template>
-          <li v-else class="nav-item">
-            <router-link class="nav-link" active-class="active" to="/sign-in">Sign in</router-link>
-          </li>
+          <template v-else>
+            <li class="nav-item">
+              <router-link class="nav-link" active-class="active" to="/sign-in">Sign in</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" active-class="active" to="/register">Register</router-link>
+            </li>
+          </template>
         </ul>
         <div v-if="isLoggedIn && user" class="d-flex align-items-center gap-2 text-white small">
           <span class="text-white-50">Signed in as</span>
