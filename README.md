@@ -3,14 +3,14 @@
 A complete client-server book library application:
 
 - **Backend Server:** FastAPI + SQLAlchemy + SQLite + MongoDB event logging
-- **Frontend Client:** Vue 3 + Vite (separate app)
+- **Frontend Client:** Vue 3 + Vite + Vue Router + Bootstrap 5 (separate app)
 - **Communication:** HTTP API with JWT bearer auth
 
 The backend and frontend run as independent services and can be started separately or together.
 
 ## Architecture
 
-- **Client (`frontend/`)** handles UI and user interaction.
+- **Client (`frontend/`)** handles UI and user interaction (routes: `/`, `/sign-in`, `/dashboard`, `/catalog`, `/discover`; shared state in `src/composables/useLibrary.js`).
 - **Server (`app/`)** handles authentication, authorization, business logic, and persistence.
 - **Database Layer:** SQLite for core records, MongoDB for optional event logs.
 
@@ -61,7 +61,7 @@ npm install
 npm run dev
 ```
 
-Frontend runs on [http://127.0.0.1:5173](http://127.0.0.1:5173)
+Frontend runs on [http://127.0.0.1:5173](http://127.0.0.1:5173). Sign in is required for dashboard, catalog, and discover pages (JWT stored in `localStorage`).
 
 ## Docker Compose (Full Stack)
 
@@ -86,6 +86,33 @@ An admin user is auto-created on startup:
 - Password: set from `.env` (`BOOTSTRAP_ADMIN_PASSWORD`)
 
 Change this pattern for production.
+
+## Seed data (dummy users and books)
+
+Load sample rows into the SQLite database defined by `SQLITE_DATABASE_URL` in `.env` (same hashing and models as the API):
+
+```bash
+source .venv/bin/activate
+python -m scripts.seed_dummy_data
+```
+
+The script is **idempotent**: existing usernames are skipped; books already present for that owner (same **title** and **ISBN**) are skipped.
+
+**Demo users** (passwords are for local development only):
+
+| Username | Password   | Role  |
+|----------|------------|-------|
+| `alice`  | `alice123` | user  |
+| `bob`    | `bob12345` | user  |
+| `carol`  | `carol123` | user  |
+
+**Books seeded** (two per user):
+
+- **alice:** *Clean Code* (Martin); *The Pragmatic Programmer* (Thomas & Hunt).
+- **bob:** *Design Patterns* (GoF); *Atomic Habits* (Clear).
+- **carol:** *Project Hail Mary* (Weir); *The Midnight Library* (Haig).
+
+Implementation: `scripts/seed_dummy_data.py`.
 
 ## Authentication Flow
 

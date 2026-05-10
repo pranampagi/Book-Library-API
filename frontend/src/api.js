@@ -11,13 +11,24 @@ function buildHeaders(token, hasJsonBody = false) {
   return headers;
 }
 
+function formatErrorDetail(detail) {
+  if (detail == null) return "Request failed";
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => (typeof item === "object" && item?.msg ? item.msg : String(item)))
+      .join(" ");
+  }
+  return JSON.stringify(detail);
+}
+
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, options);
   if (!response.ok) {
     let detail = "Request failed";
     try {
       const payload = await response.json();
-      detail = payload.detail || JSON.stringify(payload);
+      detail = formatErrorDetail(payload.detail ?? payload);
     } catch {
       detail = response.statusText || detail;
     }
